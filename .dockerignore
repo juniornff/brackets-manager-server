@@ -1,0 +1,38 @@
+# Dependencias de Node (se instalarán dentro del contenedor)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Archivos de entorno y configuración local
+.env
+.env.local
+.env.*.local
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Logs y bases de datos temporales
+*.log
+*.pid
+*.pid.lock
+
+# Archivos de IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Archivos de Docker
+.dockerignore
+Dockerfile
+docker-compose.yml
+docker-compose.*.yml
+
+# Project files
+db.json
+README.md
+LICENSE
+.git/
+.gitignore
+test-endpointsv3.js

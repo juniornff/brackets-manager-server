@@ -1,0 +1,9 @@
+services:
+  tournament-server:
+    build: .
+    container_name: brackets-manager-api
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./db.json:/app/db.json
+    restart: unless-stopped
