@@ -1,6 +1,6 @@
 services:
   tournament-server:
-    build: .
+    image: ghcr.io/juniornff/brackets-manager-server:latest
     container_name: brackets-manager-api
     ports:
       - "3000:3000"
