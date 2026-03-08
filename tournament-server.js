@@ -3,12 +3,12 @@ const { BracketsManager } = require('brackets-manager');
 const { JsonDatabase } = require('brackets-json-db');
 
 const app = express();
-const port = process.env.PORT || 3000;
-
+const port = 3000;
+const data = process.env.DATA_FILE || 'data/db.json';
 app.use(express.json());
 
 // Configuración de la base de datos y manager
-const storage = new JsonDatabase();
+const storage = new JsonDatabase(data);
 const verbose = false;
 const manager = new BracketsManager(storage, verbose);
 const USE_CUSTOM_PARTICIPANT_LOGIC = true;
@@ -1047,6 +1047,7 @@ app.use((req, res) => {
 
 // Iniciar servidor
 app.listen(port, () => {
+    console.log(`📂 Usando archivo de datos: ${data}`);
     console.log(`🎯 Servidor de torneos ejecutándose en http://localhost:${port}`);
     console.log(`📚 Endpoints disponibles:`);
     console.log(``);

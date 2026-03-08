@@ -36,3 +36,4 @@ LICENSE
 .git/
 .gitignore
 test-endpointsv3.js
+data/

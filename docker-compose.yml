@@ -5,5 +5,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./db.json:/app/db.json
+      - ./data:/app/data
+    environment:
+      - DATA_FILE=data/db.json
     restart: unless-stopped
