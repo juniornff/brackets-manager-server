@@ -370,6 +370,21 @@ app.get('/stages/:id/matches', async (req, res) => {
     }
 });
 
+// Obtener un partido por ID
+app.get('/matches/:id', async (req, res) => {
+    try {
+        const matchId = parseInt(req.params.id);
+        const match = await storage.select('match', matchId);
+        if (!match) {
+            return res.status(404).json({ error: 'Partido no encontrado' });
+        }
+        res.json(match);
+    } catch (error) {
+        console.error('❌ Error obteniendo partido:', error.message);
+        res.status(500).json({ error: 'Error obteniendo partido: ' + error.message });
+    }
+});
+
 // Actualizar un partido
 app.patch('/matches/:id', async (req, res) => {
     try {
@@ -405,6 +420,59 @@ app.patch('/matches/:id', async (req, res) => {
     }
 });
 
+// Actualizar manualmente un Match usando storage
+app.put('/matches/:id/manual', async (req, res) => {
+    try {
+        const matchId = parseInt(req.params.id);
+        const newMatchData = req.body;
+
+        console.log(`🛠️ Actualizando manualmente match ID: ${matchId}`, newMatchData);
+
+        // Verificar que el match existe
+        const existingMatch = await storage.select('match', matchId);
+        if (!existingMatch) {
+            console.log('❌ Partido no encontrado');
+            return res.status(404).json({ error: 'Partido no encontrado' });
+        }
+
+        // Asegurar que el ID no se modifique
+        newMatchData.id = matchId;
+
+        // Actualizar en la base de datos
+        const success = await storage.update('match', matchId, newMatchData);
+        if (!success) {
+            return res.status(500).json({ error: 'No se pudo actualizar el partido' });
+        }
+
+        // Obtener el registro actualizado
+        const updatedMatch = await storage.select('match', matchId);
+
+        console.log('✅ Partido actualizado manualmente');
+        res.json({
+            message: 'Partido actualizado manualmente',
+            match: updatedMatch
+        });
+    } catch (error) {
+        console.error('❌ Error actualizando partido manualmente:', error.message);
+        res.status(500).json({ error: 'Error actualizando partido manualmente: ' + error.message });
+    }
+});
+
+// Obtener un juego hijo (match game) por ID
+app.get('/match-games/:id', async (req, res) => {
+    try {
+        const gameId = parseInt(req.params.id);
+        const game = await storage.select('match_game', gameId);
+        if (!game) {
+            return res.status(404).json({ error: 'Juego hijo no encontrado' });
+        }
+        res.json(game);
+    } catch (error) {
+        console.error('❌ Error obteniendo juego hijo:', error.message);
+        res.status(500).json({ error: 'Error obteniendo juego hijo: ' + error.message });
+    }
+});
+
 // Actualizar un juego hijo (match game) - Best-of-X
 app.patch('/match-games/:id', async (req, res) => {
     try {
@@ -437,6 +505,44 @@ app.patch('/match-games/:id', async (req, res) => {
         res.status(500).json({
             error: 'Error actualizando juego hijo: ' + error.message
         });
+    }
+});
+
+// Actualizar manualmente un MatchGame usando storage
+app.put('/match-games/:id/manual', async (req, res) => {
+    try {
+        const gameId = parseInt(req.params.id);
+        const newGameData = req.body;
+
+        console.log(`🛠️ Actualizando manualmente match game ID: ${gameId}`, newGameData);
+
+        // Verificar que el juego hijo existe
+        const existingGame = await storage.select('match_game', gameId);
+        if (!existingGame) {
+            console.log('❌ Juego hijo no encontrado');
+            return res.status(404).json({ error: 'Juego hijo no encontrado' });
+        }
+
+        // Asegurar que el ID no se modifique
+        newGameData.id = gameId;
+
+        // Actualizar en la base de datos
+        const success = await storage.update('match_game', gameId, newGameData);
+        if (!success) {
+            return res.status(500).json({ error: 'No se pudo actualizar el juego hijo' });
+        }
+
+        // Obtener el registro actualizado
+        const updatedGame = await storage.select('match_game', gameId);
+
+        console.log('✅ Juego hijo actualizado manualmente');
+        res.json({
+            message: 'Juego hijo actualizado manualmente',
+            game: updatedGame
+        });
+    } catch (error) {
+        console.error('❌ Error actualizando juego hijo manualmente:', error.message);
+        res.status(500).json({ error: 'Error actualizando juego hijo manualmente: ' + error.message });
     }
 });
 
@@ -977,8 +1083,12 @@ const endpointGroups = {
     matches: {
         title: 'GESTIÓN DE PARTIDOS',
         endpoints: [
+            { method: 'GET', path: '/matches/:id', description: 'Obtener un partido por ID' },
             { method: 'PATCH', path: '/matches/:id', description: 'Actualizar un partido' },
+            { method: 'PUT', path: '/matches/:id/manual', description: 'Actualizar manualmente un partido (storage)' },
+            { method: 'GET', path: '/match-games/:id', description: 'Obtener un juego hijo por ID' },
             { method: 'PATCH', path: '/match-games/:id', description: 'Actualizar un juego hijo (Best-of-X)' },
+            { method: 'PUT', path: '/match-games/:id/manual', description: 'Actualizar manualmente un juego hijo (storage)' },
             { method: 'PATCH', path: '/match-child-count', description: 'Ajustar número de juegos hijos' },
             { method: 'GET', path: '/stages/:id/matches', description: 'Partidos de un stage' },
             { method: 'GET', path: '/matches/:id/games', description: 'Obtener juegos hijos de un partido' },
