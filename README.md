@@ -1,4 +1,4 @@
-# brackets-manager-server
+# Brackets Manager Server
 
 A simple RESTful API for the [brackets-manager.js](https://github.com/Drarig29/brackets-manager.js) library by Drarig29. This server provides an HTTP interface to manage tournaments, stages, matches, participants, and seeding operations, using `brackets-json-db` as the storage backend.
 
