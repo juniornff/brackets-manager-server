@@ -95,7 +95,7 @@ The easiest way to run the server is with Docker Compose.
     docker-compose down
     ```
 
-### Building the image manually (optional)
+### Runing the conainer manually (optional)
 
 If you prefer to build and run the image without Compose:
 
