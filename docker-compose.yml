@@ -7,5 +7,7 @@ services:
     volumes:
       - ./data:/app/data
     environment:
-      - DATA_FILE=data/db.json
+      - API_KEY=${API_KEY}
+      - DATA_FILE=db.json
+      - VERBOSE=false
     restart: unless-stopped

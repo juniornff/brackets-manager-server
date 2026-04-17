@@ -1,15 +1,18 @@
+require('dotenv').config();
 const express = require('express');
 const { BracketsManager } = require('brackets-manager');
 const { JsonDatabase } = require('brackets-json-db');
 
 const app = express();
 const port = 3000;
-const data = process.env.DATA_FILE || 'data/db.json';
+const dataFile = process.env.DATA_FILE || 'db.json';
+const data = "data/" + dataFile;
+const API_KEY = process.env.API_KEY;
 app.use(express.json());
 
 // Configuración de la base de datos y manager
 const storage = new JsonDatabase(data);
-const verbose = false;
+const verbose = process.env.VERBOSE || false;
 const manager = new BracketsManager(storage, verbose);
 const USE_CUSTOM_PARTICIPANT_LOGIC = true;
 
@@ -19,6 +22,16 @@ app.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`, req.body || '');
     next();
 });
+
+// Middleware de autenticación por API Key
+if (API_KEY) {
+    app.use((req, res, next) => {
+        if (req.path === '/health') return next();
+        const providedKey = req.headers['x-api-key'];
+        if (providedKey && providedKey === API_KEY) return next();
+        res.status(401).json({ error: 'No autorizado: API Key inválida o faltante' });
+    });
+}
 
 // =============================================
 // ENDPOINTS PRINCIPALES
@@ -1158,6 +1171,12 @@ app.use((req, res) => {
 // Iniciar servidor
 app.listen(port, () => {
     console.log(`📂 Usando archivo de datos: ${data}`);
+    if (API_KEY) {
+        console.log(`🔑 API Key habilitada. Las peticiones deben incluir header 'X-API-Key'.`);
+    }
+    if (verbose) {
+        console.log(`📊 Modo verbose activado.`);
+    }
     console.log(`🎯 Servidor de torneos ejecutándose en http://localhost:${port}`);
     console.log(`📚 Endpoints disponibles:`);
     console.log(``);
